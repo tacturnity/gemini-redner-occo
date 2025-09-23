@@ -1,0 +1,115 @@
+:root {
+    --bg-color: #000000;
+    --text-color: #e0e0e0;
+    --primary-color: #ffffff;
+    --border-color: #222;
+    --gutter-color: #282828;
+    --scrollbar-thumb-color: #444;
+}
+
+html, body, #root {
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+.app-container {
+    display: grid;
+    grid-template-columns: 1fr 5px 1fr; 
+    grid-template-rows: 100%;
+    height: 100%;
+}
+
+.panel {
+    overflow-y: auto; /* This will now work reliably */
+    box-sizing: border-box;
+    padding: 30px 40px;
+    min-width: 0; 
+}
+
+.input-panel textarea {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background-color: transparent;
+    color: var(--text-color);
+    font-size: 16px;
+    font-family: monospace;
+    line-height: 1.6;
+    resize: none;
+    outline: none;
+}
+
+.resizer {
+    background: var(--gutter-color);
+    cursor: col-resize;
+    user-select: none;
+}
+
+.content-wrapper {
+    column-gap: 40px;
+    text-align: justify;
+    height: 100%;
+}
+
+/* Dynamic Columns applied to the WRAPPER */
+.content-wrapper.cols-1 { column-count: 1; }
+.content-wrapper.cols-2 { column-count: 2; }
+.content-wrapper.cols-3 { column-count: 3; }
+.content-wrapper.cols-4 { column-count: 4; }
+
+::-webkit-scrollbar { width: 12px; }
+::-webkit-scrollbar-track { background: transparent; }
+:hover::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb-color); border-radius: 6px; }
+
+#toggle-source {
+    position: fixed;
+    bottom: 15px;
+    left: 15px;
+    width: 30px;
+    height: 30px;
+    background-color: #222;
+    color: #888;
+    border: 1px solid #444;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 28px;
+    text-align: center;
+    z-index: 1000;
+    user-select: none;
+    transition: all 0.2s ease;
+}
+
+#toggle-source:hover {
+    color: #fff;
+    background-color: #333;
+}
+
+.app-container.source-hidden {
+    grid-template-columns: 0px 0px 1fr;
+}
+
+/* --- MARKDOWN STYLES (THE FIX IS HERE) --- */
+
+/* REMOVED: The problematic break-inside rules */
+
+.output-panel h1, .output-panel h2 {
+    color: var(--primary-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    margin: 20px 0;
+    text-align: left;
+    /* This is a less aggressive rule: try not to leave a heading as the last line in a column. */
+    break-after: avoid-column; 
+}
+.output-panel h1 { font-size: 1.8em; }
+.output-panel h2 { font-size: 1.4em; }
+
+.output-panel p { margin: 0 0 1em 0; }
+.output-panel hr { border: 0; height: 1px; background-color: var(--border-color); margin: 40px 0; break-before: column;}
+.output-panel ul { padding-left: 20px; margin: 1em 0; list-style-position: outside; }
+.output-panel li { margin-bottom: 10px; }
