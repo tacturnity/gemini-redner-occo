@@ -1,3 +1,4 @@
+/* --- CSS Variables --- */
 :root {
     --bg-color: #000000;
     --text-color: #e0e0e0;
@@ -7,29 +8,25 @@
     --scrollbar-thumb-color: #444;
 }
 
+/* --- Base Styles --- */
 html, body, #root {
     height: 100vh;
     margin: 0;
-    overflow: hidden;
     font-family: 'Segoe UI', system-ui, sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
 }
 
-.app-container {
-    display: grid;
-    grid-template-columns: 1fr 5px 1fr; 
-    grid-template-rows: 100%;
-    height: 100%;
-}
-
 .panel {
-    overflow-y: auto; /* This will now work reliably */
+    overflow: auto;
     box-sizing: border-box;
     padding: 30px 40px;
-    min-width: 0; 
+    min-width: 0;
+    position: relative;
+    background-color: var(--bg-color);
 }
 
+/* --- Input Panel (textarea) Styles --- */
 .input-panel textarea {
     width: 100%;
     height: 100%;
@@ -43,15 +40,19 @@ html, body, #root {
     outline: none;
 }
 
+/* --- Resizer Styles --- */
 .resizer {
     background: var(--gutter-color);
     cursor: col-resize;
     user-select: none;
+    flex-shrink: 0;
+    width: 2px;
 }
 
+/* --- Content Wrapper (Output Panel) Styles --- */
 .content-wrapper {
     column-gap: 40px;
-    text-align: justify;
+    text-align: left;
     height: 100%;
 }
 
@@ -61,23 +62,40 @@ html, body, #root {
 .content-wrapper.cols-3 { column-count: 3; }
 .content-wrapper.cols-4 { column-count: 4; }
 
+/* --- Scrollbar Styles --- */
 ::-webkit-scrollbar { width: 12px; }
 ::-webkit-scrollbar-track { background: transparent; }
 :hover::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb-color); border-radius: 6px; }
 
+/* --- Markdown Styles --- */
+.output-panel h1, .output-panel h2 {
+    color: var(--primary-color);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    margin: 20px 0;
+    text-align: left;
+}
+.output-panel h1 { font-size: 1.8em; }
+.output-panel h2 { font-size: 1.4em; }
+.output-panel p { margin: 0 0 1em 0; }
+.output-panel hr {
+    border: 0;
+    height: 2px;
+    background-color: var(--border-color);
+    margin: 40px 0;
+}
+.output-panel ul { padding-left: 20px; margin: 1em 0; list-style-position: outside; }
+.output-panel li { margin-bottom: 10px; }
+
+
+/* --- Toggle Button Base Styles (Unified) --- */
 #toggle-source {
     position: fixed;
     bottom: 15px;
-    left: 15px;
-    width: 30px;
-    height: 30px;
     background-color: #222;
     color: #888;
     border: 1px solid #444;
-    border-radius: 50%;
     cursor: pointer;
-    font-size: 20px;
-    line-height: 28px;
     text-align: center;
     z-index: 1000;
     user-select: none;
@@ -89,27 +107,105 @@ html, body, #root {
     background-color: #333;
 }
 
-.app-container.source-hidden {
-    grid-template-columns: 0px 0px 1fr;
+
+/* ============================================== */
+/* --- MOBILE-FIRST DEFAULTS (up to 767px) --- */
+/* ============================================== */
+.app-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 100%;
+    height: 100%;
+    width: 100%;
 }
 
-/* --- MARKDOWN STYLES (THE FIX IS HERE) --- */
-
-/* REMOVED: The problematic break-inside rules */
-
-.output-panel h1, .output-panel h2 {
-    color: var(--primary-color);
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 10px;
-    margin: 20px 0;
-    text-align: left;
-    /* This is a less aggressive rule: try not to leave a heading as the last line in a column. */
-    break-after: avoid-column; 
+.app-container .input-panel {
+    display: none; /* Hidden by default on mobile */
+    position: absolute; /* Prepare for overlay */
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 10;
 }
-.output-panel h1 { font-size: 1.8em; }
-.output-panel h2 { font-size: 1.4em; }
+.app-container .resizer {
+    display: none; /* Hidden on mobile */
+}
+.app-container .output-panel {
+    display: block; /* Visible by default on mobile */
+}
 
-.output-panel p { margin: 0 0 1em 0; }
-.output-panel hr { border: 0; height: 1px; background-color: var(--border-color); margin: 40px 0; break-before: column;}
-.output-panel ul { padding-left: 20px; margin: 1em 0; list-style-position: outside; }
-.output-panel li { margin-bottom: 10px; }
+/* Mobile state: When source is active (isSourceVisible=true), show input full screen */
+.app-container.source-active .input-panel {
+    display: block; /* Override default hide */
+}
+.app-container.source-active .output-panel {
+    display: none; /* Hide output when source input is active */
+}
+
+/* Mobile Toggle Button Styling */
+#toggle-source {
+    right: 15px;
+    left: unset;
+    width: auto;
+    padding: 5px 12px;
+    border-radius: 5px;
+    font-size: 1em;
+    line-height: normal;
+    z-index: 11;
+}
+
+
+/* ============================================== */
+/* --- DESKTOP / TABLET STYLES (min-width: 768px) --- */
+/* ============================================== */
+@media (min-width: 768px) {
+    .app-container {
+        grid-template-columns: 1fr 2px 1fr; /* Initial desktop split */
+        height: 100%;
+        width: 100%;
+    }
+
+    /* Desktop state: When source is toggled OFF (inactive) */
+    .app-container.source-inactive {
+        grid-template-columns: 0px 0px 1fr; /* Collapse input and resizer */
+    }
+    /* When source is inactive, make output panel span all available grid columns */
+    .app-container.source-inactive .output-panel {
+        grid-column: 1 / span 3; /* Make output span all 3 columns */
+        width: 100%; /* <--- IMPORTANT: Explicitly ensure output fills all columns */
+    }
+
+
+    /* Desktop Toggle Button Styling */
+    #toggle-source {
+        left: 15px;
+        right: unset;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        font-size: 20px;
+        line-height: 28px;
+        z-index: 1000;
+    }
+    /* --- Toast Message Styles --- */
+#toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #222;
+    color: #e0e0e0;
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: 1px solid #444;
+    z-index: 2000;
+    font-weight: bold;
+    /* Animation for fade in and out over 2.5 seconds */
+    animation: fadeinout 2.5s forwards;
+}
+
+@keyframes fadeinout {
+    0% { opacity: 0; transform: translateY(10px); }
+    10% { opacity: 1; transform: translateY(0); }
+    90% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(10px); }
+}
+}

@@ -1,0 +1,20 @@
+# Node dependencies
+/node_modules
+.env
+.env.*
+
+# Build output
+/dist
+.vitepress/dist
+.output
+
+# Other
+.vscode/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# GitHub Pages Cache (to prevent gh-pages issues)
+.cache/
